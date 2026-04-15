@@ -1,0 +1,74 @@
+spring:
+  application:
+    name: transport-ticketing
+
+  datasource:
+    # Railway provides DATABASE_URL as a full postgres:// URI or individual vars.
+    # We prefer JDBC_DATABASE_URL (set manually) falling back to composing from parts.
+    url:      ${JDBC_DATABASE_URL:jdbc:postgresql://${PGHOST:localhost}:${PGPORT:5432}/${PGDATABASE:ticketdb}}
+    username: ${PGUSER:postgres}
+    password: ${PGPASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 20000
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: ${JPA_SHOW_SQL:false}
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+  threads:
+    virtual:
+      enabled: true
+
+  thymeleaf:
+    cache: true
+
+# Railway sets PORT — Spring Boot must listen on it
+server:
+  port: ${PORT:8080}
+
+resilience4j:
+  ratelimiter:
+    instances:
+      booking:
+        limit-for-period: 100
+        limit-refresh-period: 60s
+        timeout-duration: 0ms
+
+jwt:
+  secret:     ${JWT_SECRET}
+  expiration: 86400000
+
+encryption:
+  master-password: ${ENCRYPTION_MASTER_PASSWORD}
+
+africastalking:
+  username: ${AT_USERNAME:sandbox}
+  api-key:  ${AT_API_KEY:}
+
+mpesa:
+  callback-url: ${MPESA_CALLBACK_URL:https://your-api.railway.app/api/mpesa/callback}
+
+superadmin:
+  username: ${SUPERADMIN_USERNAME:superadmin}
+  password: ${SUPERADMIN_PASSWORD:}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
