@@ -1,7 +1,0 @@
-target/
-*.class
-*.jar
-!app.jar
-.idea/
-*.iml
-.env
